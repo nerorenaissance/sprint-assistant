@@ -65,5 +65,9 @@ export namespace Hangout {
         user: User
         space: Space
         configCompleteRedirectUrl: string
+        action: {
+            actionMethodName: string
+            parameters: any[]
+        }
     }
 }

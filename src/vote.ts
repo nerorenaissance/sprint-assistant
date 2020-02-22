@@ -23,7 +23,10 @@ export default class Vote {
 	private generateSections(count: number) {
 		return [
 			{
-				widgets: [{ textParagraph: { text: `${count} votes!` } }, ...this.generateButtons(count)],
+				widgets: [
+					{ textParagraph: { text: `${count} votes!` } },
+					{ buttons: this.generateButtons(count) },
+				],
 			},
 		]
 	}
