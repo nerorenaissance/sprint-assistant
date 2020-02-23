@@ -17,6 +17,7 @@ namespace T {
 		Estimate = "!estimate",
 		Help = "!help",
 		Standup = "!standup",
+		Debug = "!debug",
 	}
 
 	export enum Actions {
@@ -33,6 +34,8 @@ namespace Post {
 	export async function handler(req: Request, res: Response) {
 		const body: Hangout.Body = req.body
 		const { type, message, space, user, action } = body
+
+		const debug = true
 
 		if (space.type == "DM") {
 			return res.json({ text: T.Text.DM })
@@ -58,7 +61,7 @@ namespace Post {
 			const votes = messageVotes.get(message.name)
 			const alreadyVoted = votes.find(vote => vote.user === user.displayName)
 			const value = action.parameters[0].value
-			if (alreadyVoted) {
+			if (alreadyVoted && value != Vote.T.Coffee && !debug) {
 				alreadyVoted.value = value
 			} else {
 				votes.push({ user: user.displayName, value })

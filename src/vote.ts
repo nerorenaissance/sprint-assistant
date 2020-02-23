@@ -32,12 +32,14 @@ export class Pool {
 	}
 
 	private generateVotedUsersText(votes: T.Params[]) {
-		return votes.map(vote => ({
-			keyValue: {
-				topLabel: vote.user,
-				content: " ",
-			},
-		}))
+		return votes
+			.filter(vote => vote.value != T.Coffee)
+			.map(vote => ({
+				keyValue: {
+					topLabel: vote.user,
+					content: " ",
+				},
+			}))
 	}
 
 	private generateScore(votes: T.Params[]) {
@@ -60,7 +62,7 @@ export class Pool {
 				{
 					keyValue: {
 						topLabel: "Count",
-						content: votes.length,
+						content: points.length,
 					},
 				},
 				{
