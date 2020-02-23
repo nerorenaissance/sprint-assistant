@@ -35,8 +35,6 @@ namespace Post {
 		const body: Hangout.Body = req.body
 		const { type, message, space, user, action } = body
 
-		const debug = true
-
 		if (space.type == "DM") {
 			return res.json({ text: T.Text.DM })
 		}
@@ -61,7 +59,7 @@ namespace Post {
 			const votes = messageVotes.get(message.name)
 			const alreadyVoted = votes.find(vote => vote.user === user.displayName)
 			const value = action.parameters[0].value
-			if (alreadyVoted && value != Vote.T.Coffee && !debug) {
+			if (alreadyVoted && value != Vote.T.Coffee && !process.env.DEBUG) {
 				alreadyVoted.value = value
 			} else {
 				votes.push({ user: user.displayName, value })
