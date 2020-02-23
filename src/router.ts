@@ -3,8 +3,8 @@ import { Request, Response } from "express"
 import { Hangout } from "./types/index"
 import * as Vote from "./vote"
 
-const vote = new Vote.Pool()
-const msg2Votes = new Map<string, Vote.T.Params[]>()
+const pool = new Vote.Pool()
+const messageVotes = new Map<string, Vote.T.Params[]>()
 
 namespace T {
 	export enum Text {
@@ -39,7 +39,7 @@ namespace Post {
 		}
 
 		if (message?.text?.includes(T.Commands.Estimate)) {
-			return res.json(vote.create())
+			return res.json(pool.create())
 		}
 
 		if (message?.text?.includes(T.Commands.Help)) {
@@ -47,12 +47,15 @@ namespace Post {
 		}
 
 		if (action?.actionMethodName == T.Actions.Vote) {
-			if (!msg2Votes.has(message.name)) {
-				msg2Votes.set(message.name, [])
+			if (!messageVotes.has(message.name)) {
+				messageVotes.set(message.name, [])
 			}
-			const votes = msg2Votes.get(message.name)
+
+			const votes = messageVotes.get(message.name)
+
 			votes.push({ user: user.displayName, value: action.parameters[0].value })
-			const response = vote.update(votes)
+
+			const response = pool.update(votes)
 			return res.json(response)
 		}
 	}
