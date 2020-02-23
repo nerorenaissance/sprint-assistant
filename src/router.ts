@@ -25,6 +25,10 @@ namespace T {
 	}
 }
 
+namespace C {
+	export const Reducer = () => {}
+}
+
 namespace Post {
 	export async function handler(req: Request, res: Response) {
 		const body: Hangout.Body = req.body
@@ -52,8 +56,13 @@ namespace Post {
 			}
 
 			const votes = messageVotes.get(message.name)
-
-			votes.push({ user: user.displayName, value: action.parameters[0].value })
+			const alreadyVoted = votes.find(vote => vote.user === user.displayName)
+			const value = action.parameters[0].value
+			if (alreadyVoted) {
+				alreadyVoted.value = value
+			} else {
+				votes.push({ user: user.displayName, value })
+			}
 
 			const response = pool.update(votes)
 			return res.json(response)
