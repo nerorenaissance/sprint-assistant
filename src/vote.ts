@@ -101,9 +101,6 @@ export class Pool {
 			section.unshift({
 				widgets: <any>this.generateScore(votes),
 			})
-		}
-
-		if (votes?.length) {
 			section.unshift({
 				widgets: <any>this.generateVotedUsersText(votes),
 			})
