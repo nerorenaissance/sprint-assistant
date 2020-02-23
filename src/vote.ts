@@ -35,7 +35,7 @@ export class Pool {
 		return votes.map(vote => ({
 			keyValue: {
 				topLabel: vote.user,
-				content: "✅",
+				content: " ",
 			},
 		}))
 	}
@@ -47,32 +47,37 @@ export class Pool {
 		const average = Math.round(summ / points.length)
 		const max = Math.max(...points)
 		const min = Math.min(...points)
-		const metrics = [
-			{
-				keyValue: {
-					topLabel: "Average",
-					content: average,
+
+		const metrics = []
+
+		if (points.length) {
+			metrics.push(
+				{
+					keyValue: {
+						topLabel: "Average",
+						content: average,
+					},
 				},
-			},
-			{
-				keyValue: {
-					topLabel: "Count",
-					content: votes.length,
+				{
+					keyValue: {
+						topLabel: "Count",
+						content: votes.length,
+					},
 				},
-			},
-			{
-				keyValue: {
-					topLabel: "Max",
-					content: max,
+				{
+					keyValue: {
+						topLabel: "Max",
+						content: max,
+					},
 				},
-			},
-			{
-				keyValue: {
-					topLabel: "Min",
-					content: min,
+				{
+					keyValue: {
+						topLabel: "Min",
+						content: min,
+					},
 				},
-			},
-		]
+			)
+		}
 
 		if (wantingСoffee.length) {
 			metrics.push({
@@ -82,6 +87,7 @@ export class Pool {
 				},
 			})
 		}
+
 		return metrics
 	}
 
