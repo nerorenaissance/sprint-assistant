@@ -49,7 +49,6 @@ export class Pool {
 		const min = Math.min(...points)
 
 		const metrics = []
-
 		if (points.length) {
 			metrics.push(
 				{
