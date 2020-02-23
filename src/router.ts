@@ -58,4 +58,4 @@ namespace Post {
 	}
 }
 
-export default express.Router().post("/top-secret-bot", Post.handler)
+export default express.Router().post(`/${process.env.BOT_URL}`, Post.handler)
