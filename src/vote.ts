@@ -1,8 +1,19 @@
-export default class Vote {
-	private fibonacciNumbers = [1, 2, 3, 5, 8, 13]
+export namespace T {
+	export interface Params {
+		user: string
+		value: string
+	}
 
-	private generateButtons(count: number) {
-		return this.fibonacciNumbers.map(option => ({
+	export const Coffee = "☕"
+}
+
+export class Pool {
+	private decks = [0, 0.5, 1, 2, 3, 5, 8, 13, "☕"]
+
+	private counter = 0
+
+	private generateDecks() {
+		return this.decks.map(option => ({
 			textButton: {
 				text: option,
 				onClick: {
@@ -10,8 +21,8 @@ export default class Vote {
 						actionMethodName: "vote",
 						parameters: [
 							{
-								key: "count",
-								value: `${count}`,
+								key: "option",
+								value: option,
 							},
 						],
 					},
@@ -20,37 +31,109 @@ export default class Vote {
 		}))
 	}
 
-	private generateSections(count: number) {
+	private generateVotedUsersText(votes: T.Params[]) {
+		return votes.map(vote => ({
+			keyValue: {
+				topLabel: vote.user,
+				content: "✅",
+			},
+		}))
+	}
+
+	private generateScore(votes: T.Params[]) {
+		const wantingСoffee = votes.filter(vote => vote.value === T.Coffee)
+		const points = votes.filter(vote => vote.value !== T.Coffee).map(vote => Number(vote.value))
+		const summ = points.reduce((acc, point) => acc + point, 0)
+		const average = Math.round(summ / points.length)
+		const max = Math.max(...points)
+		const min = Math.min(...points)
+		const metrics = [
+			{
+				keyValue: {
+					topLabel: "Average",
+					content: average,
+				},
+			},
+			{
+				keyValue: {
+					topLabel: "Count",
+					content: votes.length,
+				},
+			},
+			{
+				keyValue: {
+					topLabel: "Max",
+					content: max,
+				},
+			},
+			{
+				keyValue: {
+					topLabel: "Min",
+					content: min,
+				},
+			},
+		]
+
+		if (wantingСoffee.length) {
+			metrics.push({
+				keyValue: {
+					topLabel: "Break ☕",
+					content: wantingСoffee.length,
+				},
+			})
+		}
+		return metrics
+	}
+
+	private generateSections(votes: T.Params[]) {
+		const section = [
+			{
+				widgets: [{ buttons: this.generateDecks() }],
+			},
+		]
+
+		if (votes?.length) {
+			section.unshift({
+				widgets: <any>this.generateScore(votes),
+			})
+		}
+
+		if (votes?.length) {
+			section.unshift({
+				widgets: <any>this.generateVotedUsersText(votes),
+			})
+		}
+
+		return section
+	}
+
+	private generateCards(votes?: T.Params[]) {
 		return [
 			{
-				widgets: [
-					{ textParagraph: { text: `${count} votes!` } },
-					{ buttons: this.generateButtons(count) },
-				],
+				header: {
+					title: `Estimation №${this.counter}`,
+					subtitle: "🚀",
+					imageUrl:
+						"https://cdn3.iconfinder.com/data/icons/teamwork-and-organization/25/list_clipboard_planning-512.png",
+					imageStyle: "IMAGE",
+				},
+				sections: this.generateSections(votes),
 			},
 		]
 	}
 
-	private generateCards(title: string, count: number) {
-		return [
-			{
-				header: { title },
-				sections: this.generateSections(count),
-			},
-		]
-	}
-
-	public create(title: string, count = 0) {
+	public create() {
+		this.counter++
 		return {
 			actionResponse: { type: "NEW_MESSAGE" },
-			cards: this.generateCards(title, count),
+			cards: this.generateCards(),
 		}
 	}
 
-	public update(title: string, count: number) {
+	public update(votes: T.Params[]) {
 		return {
 			actionResponse: { type: "UPDATE_MESSAGE" },
-			cards: this.generateCards(title, count),
+			cards: this.generateCards(votes),
 		}
 	}
 }
