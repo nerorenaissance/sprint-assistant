@@ -1,8 +1,7 @@
 import * as express from "express"
 import * as body from "body-parser"
 import Router from "./src/router"
-
-const { PORT = 3500 } = process.env
+import env from "./src/cli"
 
 const app = express()
 
@@ -14,6 +13,6 @@ app.use(
 
 app.use(body.json())
 app.use(Router)
-app.listen(PORT, () => console.log("server started at http://localhost:" + PORT))
+app.listen(env.Port, () => console.log("server started at http://localhost:" + env.Port))
 
 export default app
