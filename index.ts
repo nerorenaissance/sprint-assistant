@@ -1,7 +1,7 @@
 import * as express from "express"
 import * as body from "body-parser"
-import Router from "./src/router"
 import env from "./src/cli"
+import Router from "./src/router"
 
 if (!env.botName) {
 	throw new Error(`Env var BOT_NAME is required`)

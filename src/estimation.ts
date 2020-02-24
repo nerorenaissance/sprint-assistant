@@ -1,4 +1,5 @@
 import env from "./cli"
+const { google } = require("googleapis")
 
 export namespace T {
 	export interface Params {
@@ -16,14 +17,7 @@ export class Estimation {
 
 	private maxGap = 3
 
-	private intervalUpdateTimer = 1000
-
 	public estimation2Storys = new Map<string, T.Params[]>()
-	private estimation2Timer = new Map<string, number>()
-
-	constructor() {
-		setInterval(this.updateTimer.bind(this), this.intervalUpdateTimer)
-	}
 
 	private createDeck() {
 		return this.deck.map(option => ({
@@ -139,18 +133,12 @@ export class Estimation {
 		]
 	}
 
-	private createSection(storys: T.Params[], counter?: number) {
+	private createSection(storys: T.Params[]) {
 		const section = [
 			{
 				widgets: [{ buttons: this.createDeck() }],
 			},
 		]
-
-		if (counter) {
-			section.unshift({
-				widgets: <any>this.createTimerField(counter),
-			})
-		}
 
 		if (storys?.length) {
 			section.unshift({
@@ -164,7 +152,7 @@ export class Estimation {
 		return section
 	}
 
-	private createEstimation(storys?: T.Params[], counter?: number) {
+	private createEstimation(storys?: T.Params[]) {
 		return [
 			{
 				header: {
@@ -174,25 +162,9 @@ export class Estimation {
 						"https://cdn3.iconfinder.com/data/icons/teamwork-and-organization/25/list_clipboard_planning-512.png",
 					imageStyle: "IMAGE",
 				},
-				sections: this.createSection(storys, counter),
+				sections: this.createSection(storys),
 			},
 		]
-	}
-
-	private updateTimer() {
-		if (!this.estimation2Storys) {
-			return
-		}
-
-		for (const [estimation, storys] of this.estimation2Storys.entries()) {
-			if (!this.estimation2Timer.has(estimation)) {
-				this.estimation2Timer.set(estimation, 0)
-			}
-
-			const timer = this.estimation2Timer.get(estimation)
-			this.estimation2Timer.set(estimation, timer + 1)
-			this.updatePlanning(storys, timer)
-		}
 	}
 
 	public createPlanning() {
@@ -203,10 +175,10 @@ export class Estimation {
 		}
 	}
 
-	public updatePlanning(storys: T.Params[], counter?: number) {
+	public updatePlanning(storys: T.Params[]) {
 		return {
 			actionResponse: { type: "UPDATE_MESSAGE" },
-			cards: this.createEstimation(storys, counter),
+			cards: this.createEstimation(storys),
 		}
 	}
 }
