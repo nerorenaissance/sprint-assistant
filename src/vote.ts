@@ -94,7 +94,7 @@ export class Pool {
 			const maxIssuer = votes.find(vote => Number(vote.value) === max)
 			metrics.push({
 				keyValue: {
-					topLabel: "⚠️ Estimation disagrement ⚠️",
+					topLabel: "⚠️ Estimation disagreement",
 					contentMultiline: true,
 					content: `team have to make a compromise`,
 					bottomLabel: `${minIssuer.user}(${minIssuer.value}) 🤼‍♂️ ${maxIssuer.user}(${maxIssuer.value})`,
@@ -137,7 +137,7 @@ export class Pool {
 		return [
 			{
 				header: {
-					title: `Estimation №${this.counter}`,
+					title: `Estimation №${this.counter} ${process.env.DEBUG ? "DEBUG MODE" : ""}`,
 					subtitle: "🚀",
 					imageUrl:
 						"https://cdn3.iconfinder.com/data/icons/teamwork-and-organization/25/list_clipboard_planning-512.png",

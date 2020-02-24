@@ -8,9 +8,9 @@ const messageVotes = new Map<string, Vote.T.Params[]>()
 
 namespace T {
 	export enum Text {
-		ADDED_TO_SPACE = `Use @mention to interact with BOT. \n For more info — use !help`,
+		ADDED_TO_SPACE = "```Use @mention to interact with BOT. \n For more info — use !help```",
 		DM = "DM is not supported. Only room actions is implemented at this moment.",
-		HELP = `*!estimate* is a command to create planning poker with 0, 0.5, 1, 2, 3, 5, 8, 13, ☕ decks\n*!standup* is a command to set a daily standup meeting (DISABLED)`,
+		HELP = "```*!estimate* is a command to create planning poker with 0, 0.5, 1, 2, 3, 5, 8, 13, ☕ decks\n*!standup* is a command to set a daily standup meeting (DISABLED)```",
 	}
 
 	export enum Commands {
