@@ -5,3 +5,5 @@
 5. Create your application
 5. Configure Bot name with same name as $BOT_NAME var
 6. Connection settings -> BOT URL which should same as $BOT_URL var
+7. Search bot in google hangout with name from step 5
+8. Add bot to group
