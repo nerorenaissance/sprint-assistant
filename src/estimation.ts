@@ -7,14 +7,14 @@ export namespace T {
 	export const Coffee = "☕"
 }
 
-export class Pool {
+export class Estimation {
 	private deck = [0, 0.5, 1, 2, 3, 5, 8, 13, "☕"]
 
 	private counter = 0
 
 	private maxGap = 3
 
-	private generateDecks() {
+	private createDeck() {
 		return this.deck.map(option => ({
 			textButton: {
 				text: option,
@@ -33,35 +33,38 @@ export class Pool {
 		}))
 	}
 
-	private generateVotedUsersText(votes: T.Params[]) {
-		return votes
-			.filter(vote => vote.value != T.Coffee)
-			.map(vote => ({
+	private createUsers(storys: T.Params[]) {
+		return storys
+			.filter(story => story.value != T.Coffee)
+			.map(story => ({
 				keyValue: {
-					topLabel: vote.user,
+					topLabel: story.user,
 					content: " ",
 				},
 			}))
 	}
 
-	private isStoryDisagreement(min: number, max: number, points: number[]) {
+	private teamHasDisagreement(min: number, max: number, points: number[]) {
 		const minIndex = this.deck.findIndex(story => story === min)
 		const maxIndex = this.deck.findIndex(story => story === max)
 		const gap = this.deck.slice(minIndex, maxIndex)
 		return gap.length > this.maxGap
 	}
 
-	private generateScore(votes: T.Params[]) {
-		const wantingСoffee = votes.filter(vote => vote.value === T.Coffee)
-		const points = votes.filter(vote => vote.value !== T.Coffee).map(vote => Number(vote.value))
+	private createFields(storys: T.Params[]) {
+		const wantingСoffee = storys.filter(story => story.value === T.Coffee)
+		const points = storys
+			.filter(story => story.value !== T.Coffee)
+			.map(story => Number(story.value))
+
 		const summ = points.reduce((acc, point) => acc + point, 0)
 		const average = Math.round(summ / points.length)
 		const max = Math.max(...points)
 		const min = Math.min(...points)
 
-		const metrics = []
+		const fields = []
 		if (points.length) {
-			metrics.push(
+			fields.push(
 				{
 					keyValue: {
 						topLabel: "Average",
@@ -89,10 +92,10 @@ export class Pool {
 			)
 		}
 
-		if (this.isStoryDisagreement(min, max, points)) {
-			const minIssuer = votes.find(vote => Number(vote.value) === min)
-			const maxIssuer = votes.find(vote => Number(vote.value) === max)
-			metrics.push({
+		if (this.teamHasDisagreement(min, max, points)) {
+			const minIssuer = storys.find(story => Number(story.value) === min)
+			const maxIssuer = storys.find(story => Number(story.value) === max)
+			fields.push({
 				keyValue: {
 					topLabel: "⚠️ Estimation disagreement",
 					contentMultiline: true,
@@ -103,7 +106,7 @@ export class Pool {
 		}
 
 		if (wantingСoffee.length) {
-			metrics.push({
+			fields.push({
 				keyValue: {
 					topLabel: "Break ☕",
 					content: wantingСoffee.length,
@@ -111,29 +114,29 @@ export class Pool {
 			})
 		}
 
-		return metrics
+		return fields
 	}
 
-	private generateSections(votes: T.Params[]) {
+	private createSection(storys: T.Params[]) {
 		const section = [
 			{
-				widgets: [{ buttons: this.generateDecks() }],
+				widgets: [{ buttons: this.createDeck() }],
 			},
 		]
 
-		if (votes?.length) {
+		if (storys?.length) {
 			section.unshift({
-				widgets: <any>this.generateScore(votes),
+				widgets: <any>this.createFields(storys),
 			})
 			section.unshift({
-				widgets: <any>this.generateVotedUsersText(votes),
+				widgets: <any>this.createUsers(storys),
 			})
 		}
 
 		return section
 	}
 
-	private generateCards(votes?: T.Params[]) {
+	private createEstimation(storys?: T.Params[]) {
 		return [
 			{
 				header: {
@@ -143,23 +146,23 @@ export class Pool {
 						"https://cdn3.iconfinder.com/data/icons/teamwork-and-organization/25/list_clipboard_planning-512.png",
 					imageStyle: "IMAGE",
 				},
-				sections: this.generateSections(votes),
+				sections: this.createSection(storys),
 			},
 		]
 	}
 
-	public create() {
+	public createPlanning() {
 		this.counter++
 		return {
 			actionResponse: { type: "NEW_MESSAGE" },
-			cards: this.generateCards(),
+			cards: this.createEstimation(),
 		}
 	}
 
-	public update(votes: T.Params[]) {
+	public updatePlanning(storys: T.Params[]) {
 		return {
 			actionResponse: { type: "UPDATE_MESSAGE" },
-			cards: this.generateCards(votes),
+			cards: this.createEstimation(storys),
 		}
 	}
 }

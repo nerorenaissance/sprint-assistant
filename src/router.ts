@@ -1,10 +1,10 @@
 import * as express from "express"
 import { Request, Response } from "express"
 import { Hangout } from "./types/index"
-import * as Vote from "./vote"
+import * as Poker from "./estimation"
 
-const pool = new Vote.Pool()
-const messageVotes = new Map<string, Vote.T.Params[]>()
+const poker = new Poker.Estimation()
+const messageVotes = new Map<string, Poker.T.Params[]>()
 
 namespace T {
 	export enum Text {
@@ -44,7 +44,7 @@ namespace Post {
 		}
 
 		if (message?.text?.includes(T.Commands.Estimate)) {
-			return res.json(pool.create())
+			return res.json(poker.createPlanning())
 		}
 
 		if (message?.text?.includes(T.Commands.Help)) {
@@ -56,16 +56,16 @@ namespace Post {
 				messageVotes.set(message.name, [])
 			}
 
-			const votes = messageVotes.get(message.name)
-			const alreadyVoted = votes.find(vote => vote.user === user.displayName)
+			const storys = messageVotes.get(message.name)
+			const alreadyVoted = storys.find(story => story.user === user.displayName)
 			const value = action.parameters[0].value
-			if (alreadyVoted && value != Vote.T.Coffee && !process.env.DEBUG) {
+			if (alreadyVoted && value != Poker.T.Coffee && !process.env.DEBUG) {
 				alreadyVoted.value = value
 			} else {
-				votes.push({ user: user.displayName, value })
+				storys.push({ user: user.displayName, value })
 			}
 
-			const response = pool.update(votes)
+			const response = poker.updatePlanning(storys)
 			return res.json(response)
 		}
 	}
