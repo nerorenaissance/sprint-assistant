@@ -168,9 +168,7 @@ export class Estimation {
 		return [
 			{
 				header: {
-					title: `Estimation №${this.counter} ${
-						env.mode === "production" ? "" : "DEBUG MODE"
-					}`,
+					title: `Estimation №${this.counter} ${env.mode === "production" ? "" : "DEBUG MODE"}`,
 					subtitle: "🚀",
 					imageUrl:
 						"https://cdn3.iconfinder.com/data/icons/teamwork-and-organization/25/list_clipboard_planning-512.png",
