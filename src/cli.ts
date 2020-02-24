@@ -7,8 +7,8 @@ export namespace T {
 }
 
 export default {
-	mode: <T.Mode>process.env.MODE,
+	mode: <T.Mode>process.env.MODE || "development",
 	botName: process.env.BOT_NAME,
 	botURL: process.env.BOT_URL,
-	Port: process.env.PORT,
+	Port: process.env.PORT || 3500,
 }
