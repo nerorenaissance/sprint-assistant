@@ -57,7 +57,10 @@ export class Estimation {
 	}
 
 	private createEstimationFields(storys: T.Params[]) {
-		const wantingСoffee = storys.filter(story => story.value === T.Coffee)
+		const wantingСoffee = new Set(
+			storys.filter(story => story.value === T.Coffee).map(story => story.user),
+		)
+
 		const points = storys
 			.filter(story => story.value !== T.Coffee)
 			.map(story => Number(story.value))
@@ -110,11 +113,11 @@ export class Estimation {
 			})
 		}
 
-		if (wantingСoffee.length) {
+		if (wantingСoffee.size) {
 			fields.push({
 				keyValue: {
 					topLabel: "Break ☕",
-					content: wantingСoffee.length,
+					content: wantingСoffee.size,
 				},
 			})
 		}
