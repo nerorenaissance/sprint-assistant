@@ -1,6 +1,6 @@
 import env from "./cli"
 
-export function cleanText(text) {
+export function cleanText(text: string) {
 	return text
 		.toLowerCase()
 		.replace(`@${env.botName.toLowerCase()}`, "")
@@ -9,7 +9,7 @@ export function cleanText(text) {
 		.join(" ")
 }
 
-export function getWidgetValuePair(commands) {
+export function getWidgetValuePair(commands: string[][]) {
 	return commands.map(command => ({
 		keyValue: {
 			topLabel: command[0],
