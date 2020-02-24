@@ -8,12 +8,14 @@ export namespace T {
 }
 
 export class Pool {
-	private decks = [0, 0.5, 1, 2, 3, 5, 8, 13, "☕"]
+	private deck = [0, 0.5, 1, 2, 3, 5, 8, 13, "☕"]
 
 	private counter = 0
 
+	private maxGap = 3
+
 	private generateDecks() {
-		return this.decks.map(option => ({
+		return this.deck.map(option => ({
 			textButton: {
 				text: option,
 				onClick: {
@@ -40,6 +42,13 @@ export class Pool {
 					content: " ",
 				},
 			}))
+	}
+
+	private isStoryDisagreement(min: number, max: number, points: number[]) {
+		const minIndex = this.deck.findIndex(story => story === min)
+		const maxIndex = this.deck.findIndex(story => story === max)
+		const gap = this.deck.slice(minIndex, maxIndex)
+		return gap.length > this.maxGap
 	}
 
 	private generateScore(votes: T.Params[]) {
@@ -78,6 +87,19 @@ export class Pool {
 					},
 				},
 			)
+		}
+
+		if (this.isStoryDisagreement(min, max, points)) {
+			const minIssuer = votes.find(vote => Number(vote.value) === min)
+			const maxIssuer = votes.find(vote => Number(vote.value) === max)
+			metrics.push({
+				keyValue: {
+					topLabel: "⚠️ Estimation disagrement ⚠️",
+					contentMultiline: true,
+					content: `team have to make a compromise`,
+					bottomLabel: `${minIssuer.user}(${minIssuer.value}) 🤼‍♂️ ${maxIssuer.user}(${maxIssuer.value})`,
+				},
+			})
 		}
 
 		if (wantingСoffee.length) {
