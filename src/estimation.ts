@@ -1,3 +1,5 @@
+import env from "./cli"
+
 export namespace T {
 	export interface Params {
 		user: string
@@ -13,6 +15,15 @@ export class Estimation {
 	private counter = 0
 
 	private maxGap = 3
+
+	private intervalUpdateTimer = 1000
+
+	public estimation2Storys = new Map<string, T.Params[]>()
+	private estimation2Timer = new Map<string, number>()
+
+	constructor() {
+		setInterval(this.updateTimer.bind(this), this.intervalUpdateTimer)
+	}
 
 	private createDeck() {
 		return this.deck.map(option => ({
@@ -51,7 +62,7 @@ export class Estimation {
 		return gap.length > this.maxGap
 	}
 
-	private createFields(storys: T.Params[]) {
+	private createEstimationFields(storys: T.Params[]) {
 		const wantingСoffee = storys.filter(story => story.value === T.Coffee)
 		const points = storys
 			.filter(story => story.value !== T.Coffee)
@@ -117,16 +128,33 @@ export class Estimation {
 		return fields
 	}
 
-	private createSection(storys: T.Params[]) {
+	private createTimerField(counter: number) {
+		return [
+			{
+				keyValue: {
+					topLabel: "Timer",
+					content: counter,
+				},
+			},
+		]
+	}
+
+	private createSection(storys: T.Params[], counter?: number) {
 		const section = [
 			{
 				widgets: [{ buttons: this.createDeck() }],
 			},
 		]
 
+		if (counter) {
+			section.unshift({
+				widgets: <any>this.createTimerField(counter),
+			})
+		}
+
 		if (storys?.length) {
 			section.unshift({
-				widgets: <any>this.createFields(storys),
+				widgets: <any>this.createEstimationFields(storys),
 			})
 			section.unshift({
 				widgets: <any>this.createUsers(storys),
@@ -136,19 +164,37 @@ export class Estimation {
 		return section
 	}
 
-	private createEstimation(storys?: T.Params[]) {
+	private createEstimation(storys?: T.Params[], counter?: number) {
 		return [
 			{
 				header: {
-					title: `Estimation №${this.counter} ${process.env.DEBUG ? "DEBUG MODE" : ""}`,
+					title: `Estimation №${this.counter} ${
+						env.mode === "production" ? "" : "DEBUG MODE"
+					}`,
 					subtitle: "🚀",
 					imageUrl:
 						"https://cdn3.iconfinder.com/data/icons/teamwork-and-organization/25/list_clipboard_planning-512.png",
 					imageStyle: "IMAGE",
 				},
-				sections: this.createSection(storys),
+				sections: this.createSection(storys, counter),
 			},
 		]
+	}
+
+	private updateTimer() {
+		if (!this.estimation2Storys) {
+			return
+		}
+
+		for (const [estimation, storys] of this.estimation2Storys.entries()) {
+			if (!this.estimation2Timer.has(estimation)) {
+				this.estimation2Timer.set(estimation, 0)
+			}
+
+			const timer = this.estimation2Timer.get(estimation)
+			this.estimation2Timer.set(estimation, timer + 1)
+			this.updatePlanning(storys, timer)
+		}
 	}
 
 	public createPlanning() {
@@ -159,10 +205,10 @@ export class Estimation {
 		}
 	}
 
-	public updatePlanning(storys: T.Params[]) {
+	public updatePlanning(storys: T.Params[], counter?: number) {
 		return {
 			actionResponse: { type: "UPDATE_MESSAGE" },
-			cards: this.createEstimation(storys),
+			cards: this.createEstimation(storys, counter),
 		}
 	}
 }
