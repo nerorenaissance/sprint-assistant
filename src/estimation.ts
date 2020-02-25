@@ -117,7 +117,7 @@ export class Estimation {
 			fields.push({
 				keyValue: {
 					topLabel: "Break ☕",
-					content: wantingСoffee.size,
+					content: wantingСoffee.size ? `⚠️ ${wantingСoffee.size}` : wantingСoffee.size,
 				},
 			})
 		}
