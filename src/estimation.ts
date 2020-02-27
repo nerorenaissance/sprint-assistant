@@ -1,6 +1,3 @@
-import env from "./cli"
-const { google } = require("googleapis")
-
 export namespace T {
 	export interface Params {
 		user: string
@@ -10,8 +7,8 @@ export namespace T {
 	export const Coffee = "☕"
 }
 
-export class Estimation {
-	private deck = [0, 0.5, 1, 2, 3, 5, 8, 13, "☕"]
+class Estimation {
+	private deck = [0, 1, 2, 3, 5, 8, 13, "☕"]
 
 	private counter = 0
 
@@ -19,7 +16,7 @@ export class Estimation {
 
 	public estimation2Storys = new Map<string, T.Params[]>()
 
-	private createDeck() {
+	private createDeck(poll: number, desc: string) {
 		return this.deck.map(option => ({
 			textButton: {
 				text: option,
@@ -31,6 +28,14 @@ export class Estimation {
 								key: "option",
 								value: option,
 							},
+							{
+								key: "poll",
+								value: poll,
+							},
+							{
+								key: "desc",
+								value: desc,
+							},
 						],
 					},
 				},
@@ -38,7 +43,7 @@ export class Estimation {
 		}))
 	}
 
-	private createUsers(storys: T.Params[]) {
+	private createUsers(storys: T.Params[], poll?: number) {
 		return storys
 			.filter(story => story.value != T.Coffee)
 			.map(story => ({
@@ -53,17 +58,18 @@ export class Estimation {
 		const minIndex = this.deck.findIndex(story => story === min)
 		const maxIndex = this.deck.findIndex(story => story === max)
 		const gap = this.deck.slice(minIndex, maxIndex)
-		return gap.length > this.maxGap
+		return gap.length >= this.maxGap
 	}
 
-	private createEstimationFields(storys: T.Params[]) {
+	private createEstimationFields(storys: T.Params[], poll?: number) {
 		const wantingСoffee = new Set(
 			storys.filter(story => story.value === T.Coffee).map(story => story.user),
 		)
-
 		const points = storys
 			.filter(story => story.value !== T.Coffee)
 			.map(story => Number(story.value))
+
+		const voted = points.length
 
 		const summ = points.reduce((acc, point) => acc + point, 0)
 		const average = Math.round(summ / points.length)
@@ -75,29 +81,34 @@ export class Estimation {
 			fields.push(
 				{
 					keyValue: {
+						topLabel: "Count",
+						content: voted,
+					},
+				},
+				{
+					keyValue: {
 						topLabel: "Average",
 						content: average,
 					},
 				},
-				{
-					keyValue: {
-						topLabel: "Count",
-						content: points.length,
-					},
-				},
-				{
-					keyValue: {
-						topLabel: "Max",
-						content: max,
-					},
-				},
-				{
-					keyValue: {
-						topLabel: "Min",
-						content: min,
-					},
-				},
 			)
+
+			if (poll === points.length) {
+				fields.push(
+					{
+						keyValue: {
+							topLabel: "Max",
+							content: max,
+						},
+					},
+					{
+						keyValue: {
+							topLabel: "Min",
+							content: min,
+						},
+					},
+				)
+			}
 		}
 
 		if (this.teamHasDisagreement(min, max, points)) {
@@ -125,63 +136,69 @@ export class Estimation {
 		return fields
 	}
 
-	private createTimerField(counter: number) {
-		return [
-			{
-				keyValue: {
-					topLabel: "Timer",
-					content: counter,
-				},
-			},
-		]
-	}
-
-	private createSection(storys: T.Params[]) {
+	private createSection(storys: T.Params[], poll: number, desc: string) {
 		const section = [
 			{
-				widgets: [{ buttons: this.createDeck() }],
+				widgets: [{ buttons: this.createDeck(poll, desc) }],
 			},
 		]
 
-		if (storys?.length) {
+		if (!storys?.length) {
+			return section
+		}
+
+		section.unshift({
+			widgets: <any>this.createEstimationFields(storys, poll),
+		})
+
+		const voted = storys.filter(story => story.value !== T.Coffee).length
+		if (poll === voted) {
 			section.unshift({
-				widgets: <any>this.createEstimationFields(storys),
-			})
-			section.unshift({
-				widgets: <any>this.createUsers(storys),
+				widgets: <any>this.createUsers(storys, poll),
 			})
 		}
 
 		return section
 	}
 
-	private createEstimation(storys?: T.Params[]) {
+	private createEstimation(storys?: T.Params[], poll?: number, desc?: string) {
 		return [
 			{
 				header: {
-					title: `Estimation №${this.counter} ${env.mode === "production" ? "" : "DEBUG MODE"}`,
-					subtitle: "🚀",
+					title: `Estimation №${this.counter}
+							Poll: ${poll}             `,
+					subtitle: desc || "",
 					imageUrl:
 						"https://cdn3.iconfinder.com/data/icons/teamwork-and-organization/25/list_clipboard_planning-512.png",
 					imageStyle: "IMAGE",
 				},
-				sections: this.createSection(storys),
+				sections: this.createSection(storys, poll, desc),
 			},
 		]
 	}
 
-	public createPlanning() {
+	private createMsg(text: string) {
+		return { text: text }
+	}
+
+	public create(poll: number, desc: string) {
+		if (!poll) {
+			return this.createMsg("Error: 'poll' is required")
+		}
+
 		this.counter++
 		return {
 			actionResponse: { type: "NEW_MESSAGE" },
-			cards: this.createEstimation(),
+			cards: this.createEstimation(null, poll, desc),
 		}
 	}
 
-	public updatePlanning(storys: T.Params[]) {
+	public update(storys: T.Params[], poll: number, desc: string) {
 		return {
 			actionResponse: { type: "UPDATE_MESSAGE" },
-			cards: this.createEstimation(storys),
+			cards: this.createEstimation(storys, poll, desc),
 		}
 	}
 }
+
+export default new Estimation()
