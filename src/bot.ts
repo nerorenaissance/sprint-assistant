@@ -17,16 +17,17 @@ export namespace T {
 
 	export interface EstimateArgs {
 		poll: string
-		desc: string
+		desc?: string
 	}
 
 	export const commands = [
 		[
-			"Create Planning poker poll with 1, 2, 3, 5, 8 deck",
-			`@${env.botName} ${T.Commands.Estimate}`,
+			`Command: @${env.botName} ${T.Commands.Estimate}`,
+			`Use -poll to set amount size of voting poll
+			 Use -desc to set description of estimation`,
 		],
-		["Create daily standup meeting", `@${env.botName} ${T.Commands.Standup}`],
-		["Command list", `@${env.botName} ${T.Commands.Help}`],
+		[`Command: @${env.botName} ${T.Commands.Standup}`, "Create daily standup meeting"],
+		[`Command: @${env.botName} ${T.Commands.Help}`, "Command list"],
 	]
 
 	export const DEFAULT_MEETUP_LINK = `https://meet.google.com/gnj-nqby-pzr`
