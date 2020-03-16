@@ -30,7 +30,7 @@ export namespace T {
 		[`Command: @${env.botName} ${T.Commands.Help}`, "Command list"],
 	]
 
-	export const DEFAULT_MEETUP_LINK = `https://meet.google.com/gnj-nqby-pzr`
+	export const DEFAULT_MEETUP_LINK = process.env.DEFAULT_MEETUP_LINK
 }
 
 export function handleMessage(message: Hangout.Message) {

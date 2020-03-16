@@ -75,26 +75,24 @@ class Estimation {
 		const average = Math.round(summ / points.length)
 		const max = Math.max(...points)
 		const min = Math.min(...points)
-
+		
 		const fields = []
 		if (points.length) {
-			fields.push(
-				{
-					keyValue: {
-						topLabel: "Count",
-						content: voted,
-					},
+			fields.push({
+				keyValue: {
+					topLabel: "Count",
+					content: voted,
 				},
-				{
-					keyValue: {
-						topLabel: "Average",
-						content: average,
-					},
-				},
-			)
+			})
 
 			if (poll === points.length) {
 				fields.push(
+					{
+						keyValue: {
+							topLabel: "Average",
+							content: average,
+						},
+					},
 					{
 						keyValue: {
 							topLabel: "Max",
@@ -151,12 +149,9 @@ class Estimation {
 			widgets: <any>this.createEstimationFields(storys, poll),
 		})
 
-		const voted = storys.filter(story => story.value !== T.Coffee).length
-		if (poll === voted) {
-			section.unshift({
-				widgets: <any>this.createUsers(storys, poll),
-			})
-		}
+		section.unshift({
+			widgets: <any>this.createUsers(storys, poll),
+		})
 
 		return section
 	}

@@ -20,7 +20,6 @@ namespace Bot {
 	export async function handler(req: Request, res: Response) {
 		const body: Hangout.Body = req.body
 		const { type, message, space, user } = body
-
 		if (space.type == "DM") {
 			return res.json({ text: T.TextResponces.DM })
 		}
